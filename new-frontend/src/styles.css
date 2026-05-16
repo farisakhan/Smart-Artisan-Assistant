@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  background: #f5f7fb;
+  font-family: sans-serif;
+}
+
+.desktop-sidebar {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .desktop-sidebar {
+    display: none;
+  }
+}
+@media (max-width: 768px) {
+  .desktop-sidebar {
+    display: none;
+  }
+}
