@@ -1,22 +1,26 @@
 import {
   Badge,
-  Button,
   Card,
   Grid,
   Group,
   Table,
   Text,
   Title,
+  Progress,
 } from "@mantine/core";
 
 import {
   AreaChart,
   Area,
+  BarChart,
+  Bar,
   PieChart,
   Pie,
+  Cell,
   Tooltip,
   ResponsiveContainer,
-  Cell,
+  XAxis,
+  YAxis,
 } from "recharts";
 
 import AppLayout from "../../components/layout/AppLayout";
@@ -26,6 +30,37 @@ function AdminReports() {
     JSON.parse(localStorage.getItem("entries")) ||
     [];
 
+  // ANALYTICS
+  const totalRevenue = entries.reduce(
+    (acc, item) =>
+      acc +
+      Number(item.sellingPrice || 0) *
+        Number(item.quantity || 0),
+    0
+  );
+
+  const totalProfit = entries.reduce(
+    (acc, item) =>
+      acc + Number(item.profit || 0),
+    0
+  );
+
+  const delivered = entries.filter(
+    (item) =>
+      item.status === "Delivered"
+  ).length;
+
+  const preparing = entries.filter(
+    (item) =>
+      item.status === "Preparing"
+  ).length;
+
+  const ready = entries.filter(
+    (item) =>
+      item.status === "Ready"
+  ).length;
+
+  // REVENUE CHART
   const revenueData = [
     {
       month: "Jan",
@@ -45,33 +80,23 @@ function AdminReports() {
     },
     {
       month: "May",
-      revenue: 16000,
+      revenue: totalRevenue,
     },
   ];
 
+  // STATUS CHART
   const statusData = [
     {
       name: "Preparing",
-      value: entries.filter(
-        (e) =>
-          e.status === "Preparing"
-      ).length,
+      value: preparing,
     },
-
     {
       name: "Ready",
-      value: entries.filter(
-        (e) =>
-          e.status === "Ready"
-      ).length,
+      value: ready,
     },
-
     {
       name: "Delivered",
-      value: entries.filter(
-        (e) =>
-          e.status === "Delivered"
-      ).length,
+      value: delivered,
     },
   ];
 
@@ -89,33 +114,89 @@ function AdminReports() {
       >
         <div>
           <Title order={2}>
-            Reports & Analytics
+            Admin Reports
           </Title>
 
           <Text c="dimmed">
-            Platform insights and
-            analytics
+            Platform-wide analytics and
+            artisan performance
           </Text>
         </div>
 
-        <Button>
-          Download Reports
-        </Button>
+        <Badge
+          size="lg"
+          color="green"
+        >
+          Live Analytics
+        </Badge>
       </Group>
+
+      {/* TOP STATS */}
+      <Grid mb={25}>
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Card shadow="sm" radius="lg">
+            <Text size="sm">
+              Platform Revenue
+            </Text>
+
+            <Title order={2}>
+              ₹{totalRevenue}
+            </Title>
+
+            <Progress
+              value={75}
+              mt={15}
+            />
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Card shadow="sm" radius="lg">
+            <Text size="sm">
+              Total Profit
+            </Text>
+
+            <Title order={2}>
+              ₹{totalProfit}
+            </Title>
+
+            <Progress
+              value={60}
+              color="green"
+              mt={15}
+            />
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <Card shadow="sm" radius="lg">
+            <Text size="sm">
+              Delivered Orders
+            </Text>
+
+            <Title order={2}>
+              {delivered}
+            </Title>
+
+            <Progress
+              value={90}
+              color="orange"
+              mt={15}
+            />
+          </Card>
+        </Grid.Col>
+      </Grid>
 
       {/* CHARTS */}
       <Grid mb={25}>
+        {/* AREA CHART */}
         <Grid.Col span={{ base: 12, md: 7 }}>
-          <Card
-            shadow="sm"
-            radius="lg"
-            p="lg"
-          >
+          <Card shadow="sm" radius="lg">
             <Title
               order={4}
               mb={20}
             >
-              Monthly Revenue
+              Revenue Growth
             </Title>
 
             <ResponsiveContainer
@@ -125,12 +206,16 @@ function AdminReports() {
               <AreaChart
                 data={revenueData}
               >
+                <XAxis dataKey="month" />
+
+                <YAxis />
+
                 <Tooltip />
 
                 <Area
                   type="monotone"
                   dataKey="revenue"
-                  stroke="#3b82f6"
+                  stroke="#2563eb"
                   fill="#93c5fd"
                 />
               </AreaChart>
@@ -138,17 +223,14 @@ function AdminReports() {
           </Card>
         </Grid.Col>
 
+        {/* PIE CHART */}
         <Grid.Col span={{ base: 12, md: 5 }}>
-          <Card
-            shadow="sm"
-            radius="lg"
-            p="lg"
-          >
+          <Card shadow="sm" radius="lg">
             <Title
               order={4}
               mb={20}
             >
-              Order Status
+              Order Distribution
             </Title>
 
             <ResponsiveContainer
@@ -186,20 +268,51 @@ function AdminReports() {
         </Grid.Col>
       </Grid>
 
+      {/* PRODUCT PERFORMANCE */}
+      <Grid mb={25}>
+        <Grid.Col span={12}>
+          <Card shadow="sm" radius="lg">
+            <Title
+              order={4}
+              mb={20}
+            >
+              Product Performance
+            </Title>
+
+            <ResponsiveContainer
+              width="100%"
+              height={300}
+            >
+              <BarChart
+                data={entries}
+              >
+                <XAxis dataKey="product" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Bar
+                  dataKey="profit"
+                  fill="#6366f1"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+        </Grid.Col>
+      </Grid>
+
       {/* REPORT TABLE */}
-      <Card
-        shadow="sm"
-        radius="lg"
-      >
+      <Card shadow="sm" radius="lg">
         <Group
           justify="space-between"
           mb={20}
         >
           <Title order={4}>
-            Product Reports
+            Platform Product Insights
           </Title>
 
-          <Badge color="green">
+          <Badge color="blue">
             Updated Live
           </Badge>
         </Group>
@@ -219,15 +332,15 @@ function AdminReports() {
               </Table.Th>
 
               <Table.Th>
-                Status
-              </Table.Th>
-
-              <Table.Th>
                 Profit
               </Table.Th>
 
               <Table.Th>
-                Date
+                Status
+              </Table.Th>
+
+              <Table.Th>
+                Performance
               </Table.Th>
             </Table.Tr>
           </Table.Thead>
@@ -243,6 +356,10 @@ function AdminReports() {
 
                 <Table.Td>
                   {item.quantity}
+                </Table.Td>
+
+                <Table.Td>
+                  ₹{item.profit}
                 </Table.Td>
 
                 <Table.Td>
@@ -262,13 +379,14 @@ function AdminReports() {
                 </Table.Td>
 
                 <Table.Td>
-                  ₹{item.profit}
-                </Table.Td>
-
-                <Table.Td>
-                  {
-                    item.createdAt
-                  }
+                  <Progress
+                    value={
+                      Math.min(
+                        item.profit / 50,
+                        100
+                      )
+                    }
+                  />
                 </Table.Td>
               </Table.Tr>
             ))}

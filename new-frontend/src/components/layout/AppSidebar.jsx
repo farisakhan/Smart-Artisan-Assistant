@@ -74,7 +74,9 @@ function AppSidebar() {
         width: 260,
         background: "#111827",
         color: "white",
-        height: "100vh",
+        minHeight: "100vh",
+position: "sticky",
+top: 0,
         padding: 20,
       }}
     >

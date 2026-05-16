@@ -1,120 +1,116 @@
 import {
+  ActionIcon,
   Avatar,
   Burger,
   Group,
-  Indicator,
   Menu,
   Text,
-  ActionIcon,
 } from "@mantine/core";
 
 import {
   IconBell,
-  IconUser,
   IconLogout,
+  IconUser,
 } from "@tabler/icons-react";
 
 import { useNavigate } from "react-router-dom";
 
-function AppNavbar({ opened, toggle }) {
+function AppNavbar({
+  opened,
+  setOpened,
+}) {
   const navigate = useNavigate();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
 
   const logout = () => {
     localStorage.removeItem("user");
-    navigate("/");
-  };
 
-  const goProfile = () => {
-    if (user.role === "artisan") {
-      navigate("/artisan/profile");
-    } else {
-      navigate("/admin/profile");
-    }
+    navigate("/");
   };
 
   return (
     <div
       style={{
-        height: 70,
         background: "white",
-        borderBottom: "1px solid #eee",
-        padding: "0 20px",
+        padding: "15px 20px",
+        borderRadius: 12,
         display: "flex",
+        justifyContent:
+          "space-between",
         alignItems: "center",
-        justifyContent: "space-between",
       }}
     >
+      {/* LEFT */}
       <Group>
         <Burger
           opened={opened}
-          onClick={toggle}
-          size="sm"
+          onClick={() =>
+            setOpened(!opened)
+          }
         />
 
-        <Text fw={700} size="lg">
-          Artisan Hub
-        </Text>
+        <div>
+          <Text fw={700} size="lg">
+            {user?.role === "admin"
+              ? "Admin Hub"
+              : "Artisan Hub"}
+          </Text>
+
+          <Text
+            size="sm"
+            c="dimmed"
+          >
+            Welcome back,
+            {" "}
+            {user?.name}
+          </Text>
+        </div>
       </Group>
 
+      {/* RIGHT */}
       <Group>
-        {/* Notifications */}
-        <Menu shadow="md" width={250}>
+        {/* NOTIFICATION */}
+        <ActionIcon
+          variant="light"
+          size="lg"
+          radius="xl"
+        >
+          <IconBell size={18} />
+        </ActionIcon>
+
+        {/* PROFILE */}
+        <Menu shadow="md">
           <Menu.Target>
-            <Indicator color="red" size={8}>
-              <ActionIcon variant="light" size="lg">
-                <IconBell size={18} />
-              </ActionIcon>
-            </Indicator>
-          </Menu.Target>
-
-          <Menu.Dropdown>
-            <Menu.Label>Notifications</Menu.Label>
-
-            <Menu.Item>
-              New product entry added
-            </Menu.Item>
-
-            <Menu.Item>
-              Weekly report generated
-            </Menu.Item>
-
-            <Menu.Item>
-              Earnings updated
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-
-        {/* Profile */}
-        <Menu shadow="md" width={220}>
-          <Menu.Target>
-            <Group style={{ cursor: "pointer" }}>
-              <Avatar radius="xl" />
-
-              <div>
-                <Text fw={600}>
-                  {user?.name}
-                </Text>
-
-                <Text size="xs" c="dimmed">
-                  {user?.role}
-                </Text>
-              </div>
-            </Group>
+            <Avatar
+              radius="xl"
+              style={{
+                cursor: "pointer",
+              }}
+            >
+              {user?.name?.[0]}
+            </Avatar>
           </Menu.Target>
 
           <Menu.Dropdown>
             <Menu.Item
-              leftSection={<IconUser size={16} />}
-              onClick={goProfile}
+              leftSection={
+                <IconUser size={16} />
+              }
+              onClick={() =>
+                navigate("/profile")
+              }
             >
               Profile
             </Menu.Item>
 
             <Menu.Item
               color="red"
-              leftSection={<IconLogout size={16} />}
+              leftSection={
+                <IconLogout size={16} />
+              }
               onClick={logout}
             >
               Logout

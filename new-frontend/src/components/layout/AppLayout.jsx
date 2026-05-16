@@ -1,54 +1,59 @@
-import { Drawer } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import {
+  AppShell,
+} from "@mantine/core";
+
+import { useState } from "react";
 
 import AppNavbar from "./AppNavbar";
 import AppSidebar from "./AppSidebar";
 
 function AppLayout({ children }) {
-  const [opened, { toggle, close }] =
-    useDisclosure(false);
+  const [opened, setOpened] =
+    useState(true);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        minHeight: "100vh",
+    <AppShell
+      padding="md"
+      navbar={{
+        width: opened ? 260 : 0,
+        breakpoint: "sm",
       }}
     >
-      {/* Desktop Sidebar */}
-      <div className="desktop-sidebar">
-        <AppSidebar />
-      </div>
+      {/* SIDEBAR */}
+      {opened && (
+        <AppShell.Navbar
+          p={0}
+          style={{
+            border: "none",
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
+          <AppSidebar />
+        </AppShell.Navbar>
+      )}
 
-      {/* Mobile Sidebar */}
-      <Drawer
-        opened={opened}
-        onClose={close}
-        withCloseButton={false}
-        size={260}
-        hiddenFrom="md"
-        padding={0}
-      >
-        <AppSidebar closeDrawer={close} />
-      </Drawer>
-
-      {/* Main Content */}
-      <div
+      {/* MAIN */}
+      <AppShell.Main
         style={{
-          flex: 1,
-          background: "#f5f7fb",
+          minHeight: "100vh",
+          background: "#f3f4f6",
         }}
       >
         <AppNavbar
           opened={opened}
-          toggle={toggle}
+          setOpened={setOpened}
         />
 
-        <div style={{ padding: 20 }}>
+        <div
+          style={{
+            marginTop: 20,
+          }}
+        >
           {children}
         </div>
-      </div>
-    </div>
+      </AppShell.Main>
+    </AppShell>
   );
 }
 
