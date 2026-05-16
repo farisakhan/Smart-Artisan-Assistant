@@ -114,9 +114,17 @@ function AppSidebar() {
 }
 
 function TextLogo() {
+  const user = JSON.parse(
+    localStorage.getItem("user")
+  );
+
   return (
     <div>
-      <h2>Artisan Hub</h2>
+      <h2>
+        {user?.role === "admin"
+          ? "Admin Hub"
+          : "Artisan Hub"}
+      </h2>
 
       <p
         style={{
@@ -125,7 +133,9 @@ function TextLogo() {
           fontSize: 14,
         }}
       >
-        Craft Management System
+        {user?.role === "admin"
+          ? "Administration Panel"
+          : "Craft Management System"}
       </p>
     </div>
   );
